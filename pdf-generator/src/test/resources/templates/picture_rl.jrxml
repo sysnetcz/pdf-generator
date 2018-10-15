@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="picture_rl" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6d25fdd4-6358-40d0-bb1f-b56c63c73800">
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<queryString language="JSON">
+		<![CDATA[]]>
+	</queryString>
+	<field name="authority" class="java.lang.String">
+		<fieldDescription><![CDATA[authority]]></fieldDescription>
+	</field>
+	<field name="barcode" class="java.lang.String">
+		<fieldDescription><![CDATA[barcode]]></fieldDescription>
+	</field>
+	<field name="idno" class="java.lang.String">
+		<fieldDescription><![CDATA[idno]]></fieldDescription>
+	</field>
+	<field name="annex" class="java.lang.Integer">
+		<fieldDescription><![CDATA[annex]]></fieldDescription>
+	</field>
+	<field name="picture" class="java.lang.String">
+		<fieldDescription><![CDATA[picture]]></fieldDescription>
+	</field>
+	<field name="issuingOfficial" class="java.lang.String">
+		<fieldDescription><![CDATA[issuingOfficial]]></fieldDescription>
+	</field>
+	<field name="issuingPlace" class="java.lang.String">
+		<fieldDescription><![CDATA[issuingPlace]]></fieldDescription>
+	</field>
+	<field name="issuingDate" class="java.sql.Date">
+		<fieldDescription><![CDATA[issuingDate]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="90" splitType="Stretch">
+			<staticText>
+				<reportElement x="26" y="0" width="179" height="40" uuid="edace197-cddc-4fa1-9f81-cfc38156a2ad"/>
+				<box padding="2">
+					<pen lineWidth="2.0"/>
+					<bottomPen lineWidth="0.25"/>
+				</box>
+				<textElement>
+					<font fontName="DejaVu Sans" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REGISTRAČNÍ LIST č.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="26" y="40" width="179" height="40" uuid="c2bd569d-85b5-4e7f-84d6-9a415252d918"/>
+				<box padding="2">
+					<pen lineWidth="2.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="2.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="2.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="2.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement>
+					<font fontName="DejaVu Sans" isBold="true"/>
+				</textElement>
+				<text><![CDATA[PŘÍLOHA č.]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement mode="Transparent" x="230" y="0" width="80" height="80" uuid="906c2217-1e15-437c-93a0-4cbc4a3c6ff4"/>
+				<jr:QRCode xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" errorCorrectionLevel="H">
+					<jr:codeExpression><![CDATA["PHA/01212/2004"]]></jr:codeExpression>
+				</jr:QRCode>
+			</componentElement>
+			<staticText>
+				<reportElement x="330" y="0" width="225" height="79" uuid="56175902-dfe6-4ddb-becb-d562daf69742"/>
+				<box padding="2">
+					<pen lineWidth="2.0"/>
+					<bottomPen lineWidth="2.0"/>
+				</box>
+				<textElement>
+					<font fontName="DejaVu Sans" size="8"/>
+				</textElement>
+				<text><![CDATA[Vydávající výkonný orgán]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="26" y="20" width="179" height="20" uuid="a39bd2aa-9254-46a8-99d3-27ee8b4e1d5f"/>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{idno}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="26" y="60" width="179" height="20" uuid="3f357dd1-743f-497e-a214-6f7e970f8988"/>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{annex}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="330" y="20" width="223" height="59" uuid="285c6638-c461-403c-9ce8-7f81a7fa65f7"/>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{authority}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="549" splitType="Stretch">
+			<rectangle>
+				<reportElement x="26" y="0" width="529" height="529" uuid="49f51ee6-3a18-495a-8687-8ff1cd015c9a"/>
+				<graphicElement>
+					<pen lineWidth="2.0" lineStyle="Solid"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="26" y="0" width="179" height="16" uuid="efee86ed-19d9-4b40-8e11-f51eac623efc"/>
+				<box padding="2">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans" size="8"/>
+				</textElement>
+				<text><![CDATA[razítko]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="376" y="0" width="179" height="16" uuid="0a7a35f8-9a18-41de-855d-d3269fc58dcc"/>
+				<box padding="2">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans" size="8"/>
+				</textElement>
+				<text><![CDATA[razítko]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="26" y="513" width="179" height="16" uuid="052fc604-0acc-476a-9954-6e54ef50f32f"/>
+				<box padding="2">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans" size="8"/>
+				</textElement>
+				<text><![CDATA[razítko]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="376" y="513" width="179" height="16" uuid="f106d14f-3635-4c85-a4fe-e1bc2a2fea2e"/>
+				<box padding="2">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans" size="8"/>
+				</textElement>
+				<text><![CDATA[razítko]]></text>
+			</staticText>
+			<image hAlign="Center" vAlign="Middle">
+				<reportElement x="30" y="4" width="520" height="520" uuid="452f7329-596d-45c8-87ba-ec681ff9ee67"/>
+				<imageExpression><![CDATA[$F{picture}]]></imageExpression>
+			</image>
+		</band>
+	</detail>
+	<columnFooter>
+		<band splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="145" splitType="Stretch">
+			<rectangle>
+				<reportElement x="26" y="1" width="529" height="139" uuid="d745983c-ecb0-4af5-9b65-48aa7ec42a3d"/>
+				<graphicElement>
+					<pen lineWidth="2.0" lineStyle="Solid"/>
+				</graphicElement>
+			</rectangle>
+			<staticText>
+				<reportElement x="26" y="1" width="528" height="29" uuid="bd2dce3e-8ce1-43a2-8154-bfab8d05b8c8"/>
+				<box padding="2">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Left">
+					<font fontName="DejaVu Sans" size="8"/>
+				</textElement>
+				<text><![CDATA[Tato příloha je nedílnou součástí a platí jen s autorizovaným originálem příslušného registračního listu.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="26" y="124" width="179" height="16" uuid="18918ff4-f136-49bc-899f-a4dbc00bcf50"/>
+				<box padding="2">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans" size="8"/>
+				</textElement>
+				<text><![CDATA[Jméno vydávajícího úředníka]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="220" y="124" width="179" height="16" uuid="f412a238-1ea7-41d4-88cf-59138ecb1322"/>
+				<box padding="2">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans" size="8"/>
+				</textElement>
+				<text><![CDATA[Místo a datum]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="375" y="124" width="179" height="16" uuid="44d547a5-f99f-44ee-8c01-273b64ea2020"/>
+				<box padding="2">
+					<pen lineWidth="0.0"/>
+					<topPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<leftPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<bottomPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+					<rightPen lineWidth="0.0" lineStyle="Solid" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans" size="8"/>
+				</textElement>
+				<text><![CDATA[Podpis a razítko]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="26" y="101" width="179" height="20" uuid="de4f2259-8a9a-45fe-87dc-ad369ec47859"/>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{issuingOfficial}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="220" y="101" width="179" height="20" uuid="2b7ff781-dd2a-4e71-b039-d1a43280de60"/>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("d.M.yyyy").format($F{issuingDate})]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="220" y="80" width="179" height="20" uuid="58014a36-086d-49b9-ac45-6afdc31ea406"/>
+				<textElement textAlignment="Center">
+					<font fontName="DejaVu Sans"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{issuingPlace}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>
