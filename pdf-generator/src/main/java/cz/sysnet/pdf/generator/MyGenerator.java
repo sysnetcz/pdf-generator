@@ -35,7 +35,7 @@ public class MyGenerator {
 		try {
 			
 		JsonParser parser = new JsonParser();
-		//Gson gson = new Gson();			
+		Gson gson = new Gson();			
 		
 		String jrxmlFileName = "src/test/resources/templates/picture_rl.jrxml";
 		String jasperFileName = "src/test/resources/templates/picture_rl.jasper";
@@ -49,7 +49,13 @@ public class MyGenerator {
 		BufferedReader br = new BufferedReader(new FileReader(jsonFile));
 		JsonObject jo = parser.parse(br).getAsJsonObject();
 		String rawJsonData = jo.toString();
-		ByteArrayInputStream jsonDataStream = new ByteArrayInputStream(rawJsonData.getBytes());
+		
+		String js = gson.toJson(jo);
+		byte[] utf8JsonString = js.getBytes("UTF8");
+		
+		//ByteArrayInputStream jsonDataStream = new ByteArrayInputStream(rawJsonData.getBytes());
+		ByteArrayInputStream jsonDataStream = new ByteArrayInputStream(utf8JsonString);
+		
 	    JsonDataSource ds = new JsonDataSource(jsonDataStream);
 	    
 	    Map<String, Object> parameters = new HashMap<String, Object>();
