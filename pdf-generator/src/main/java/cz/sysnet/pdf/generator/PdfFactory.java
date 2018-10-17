@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -61,13 +62,13 @@ public class PdfFactory {
 	private Map<String, String> templateMap;
 
 	public static final String FILE_SEPARATOR = System.getProperty("file.separator");
-	public static final String TEMP_PATH = (System.getProperty("java.io.tmpdir") + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
-	public static final String WORK_PATH = (System.getProperty("user.dir") + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
-	public static final String DATA_PATH = (System.getProperty("user.home") + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
-	public static final String TEMPLATE_PATH = DATA_PATH + "templates"  + FILE_SEPARATOR;
-	public static final String PDF_PATH = DATA_PATH + "pdf"  + FILE_SEPARATOR;
-	public static final String CONFIG_PATH = DATA_PATH;
-	public static final String CONFIG_TEMPLATES_PATH = CONFIG_PATH + "templates.json";
+	public static final String PATH_TEMP = (System.getProperty("java.io.tmpdir") + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
+	public static final String PATH_WORK = (System.getProperty("user.dir") + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
+	public static final String PATH_DATA = (System.getProperty("user.home") + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
+	public static final String PATH_TEMPLATE = PATH_DATA + "templates"  + FILE_SEPARATOR;
+	public static final String PATH_PDF = PATH_DATA + "pdf"  + FILE_SEPARATOR;
+	public static final String PATH_CONFIG = PATH_DATA;
+	public static final String FILE_CONFIG_TEMPLATES = PATH_CONFIG + "templates.json";
 	
 	private PdfFactory() {
 		super();
@@ -81,8 +82,36 @@ public class PdfFactory {
 				.setPrettyPrinting()
 				.create();
 		jsonParser = new JsonParser();
+		
+		this.initDirectories();
+		
 		this.templateMap = new HashMap<String, String>();
+		
+		Path cp = Paths.get(FILE_CONFIG_TEMPLATES);
+		if (Files.exists(cp)) this.loadTemplateMap();
 		LOG.info("Init done");
+	}
+	
+	private void initDirectories() {
+		this.createDirectoryTree(PATH_CONFIG);
+		this.createDirectoryTree(PATH_DATA);
+		this.createDirectoryTree(PATH_PDF);
+		this.createDirectoryTree(PATH_TEMP);
+		this.createDirectoryTree(PATH_TEMPLATE);
+		this.createDirectoryTree(PATH_WORK);
+	}
+	
+	private void createDirectoryTree(String pathString) {
+		try {
+			Path path = Paths.get(pathString);
+			if (!Files.exists(path)) {
+				Files.createDirectories(path);
+				LOG.info("Directory created: " + path.toString());
+			}
+		} catch (Exception e) {
+			LOG.error("PdfFactory.createDirectoryTree: " + e.getMessage());
+			e.printStackTrace();
+		}
 	}
 	
 	public static PdfFactory getInstance() {
@@ -190,7 +219,7 @@ public class PdfFactory {
 	public String addTemplate(String key, String sourceFile, boolean removeSource) {
 		try {
 			File file = new File(sourceFile);
-			String targetFile = TEMPLATE_PATH + key + FILE_SEPARATOR + file.getName();
+			String targetFile = PATH_TEMPLATE + key + FILE_SEPARATOR + file.getName();
 			Path sourceFilePath = Paths.get(sourceFile);
 			if (!Files.exists(sourceFilePath)) throw new PdfGeneratorException("Zdrojový soubor neexistuje: " + sourceFilePath.toString());
 			Path targetFilePath = Paths.get(targetFile);
@@ -222,7 +251,7 @@ public class PdfFactory {
 	public String addTemplateResource(String key, String sourceFile, boolean removeSource) {
 		try {
 			File file = new File(sourceFile);
-			String targetFile = TEMPLATE_PATH + key + FILE_SEPARATOR + file.getName();
+			String targetFile = PATH_TEMPLATE + key + FILE_SEPARATOR + file.getName();
 			Path sourceFilePath = Paths.get(sourceFile);
 			if (!Files.exists(sourceFilePath)) throw new PdfGeneratorException("Zdrojový soubor neexistuje: " + sourceFilePath.toString());
 			Path targetFilePath = Paths.get(targetFile);
@@ -407,8 +436,8 @@ public class PdfFactory {
 		    JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, ds);
 		    if (pdfFileName == null) pdfFileName = generatePdfFileName();
 		    if (pdfFileName.isEmpty()) pdfFileName = generatePdfFileName();
-		    String pdfPath = PDF_PATH + pdfFileName;
-			Path targetFilePath = Paths.get(PDF_PATH);
+		    String pdfPath = PATH_PDF + pdfFileName;
+			Path targetFilePath = Paths.get(PATH_PDF);
 			if (!Files.exists(targetFilePath)) {
 				Path td = Files.createDirectories(targetFilePath);
 				LOG.info("Directory created: " + td.toString());
@@ -425,7 +454,6 @@ public class PdfFactory {
 			return null;
 		}
 	}
-	
 
 	public Map<String, String> getTemplateMap() {
 		return templateMap;
@@ -437,17 +465,48 @@ public class PdfFactory {
 	
 	public boolean storeTemplateMap() {
 		try {
-			Path path = Paths.get(CONFIG_TEMPLATES_PATH);
-			Files.deleteIfExists(path);
-			BufferedWriter bw = Files.newBufferedWriter(path);
-			gson.toJson(this.templateMap, bw);
-			bw.flush();
-			bw.close();
-			LOG.info("Template map stored");
+			if(this.templateMap == null) this.templateMap = new HashMap<String, String>(); 
+			
+			File file = new File(FILE_CONFIG_TEMPLATES);
+			if(file.exists()) {
+				LOG.debug("File exists: " + file.getAbsolutePath());
+			} else {
+				LOG.debug("File does not exist: " + file.getAbsolutePath());
+				file.getParentFile().mkdirs();
+				boolean n = file.createNewFile();
+				n = file.createNewFile();
+				if (n) LOG.debug("File created: " + file.getAbsolutePath());
+			}
+			FileWriter fw = new FileWriter(file);
+			gson.toJson(this.templateMap, fw);
+			fw.flush();
+			fw.close();
+			LOG.info("Template Map stored");
 			return true;
 			
 		} catch (Exception e) {
 			LOG.error("PdfFactory.storeTemplateMap: " + e.getMessage());
+			e.printStackTrace();
+			return false;
+		} 
+	}
+	
+	public boolean removeTemplateMap() {
+		try {
+			File file = new File(FILE_CONFIG_TEMPLATES);
+			if(file.exists()) {
+				FileWriter fstream = new FileWriter(file,false);
+	            BufferedWriter out = new BufferedWriter(fstream);
+	            out.write("");
+	            out.close();
+	            fstream.close();
+				LOG.info("TemplateMap file was cleared");
+				return true;
+			}
+			return false;
+			
+		} catch (Exception e) {
+			LOG.error("PdfFactory.removeTemplateMap: " + e.getMessage());
 			e.printStackTrace();
 			return false;
 		}
@@ -455,13 +514,14 @@ public class PdfFactory {
 	
 	public void cleanTemplateMap() {
 		this.templateMap = new HashMap<String, String>();
+		LOG.info("TemplateMap cleared");
 	}
 	
 	@SuppressWarnings("unchecked")
 	public boolean loadTemplateMap() {
 		try {
 			if (this.templateMap == null) this.templateMap = new HashMap<String, String>();
-			Path path = Paths.get(CONFIG_TEMPLATES_PATH);
+			Path path = Paths.get(FILE_CONFIG_TEMPLATES);
 			if (!Files.exists(path)) throw new PdfGeneratorException("Konfigurace šablon neexistuje: " + path.toString());
 			BufferedReader br = Files.newBufferedReader(path);
 			if (br == null) throw new PdfGeneratorException("BufferedReader == null");
@@ -501,5 +561,23 @@ public class PdfFactory {
 			return null;
 		}
 	}
+	
+//	private static boolean isFileLocked(String filePath) {
+//		File file = new File(filePath);
+//		return isFileLocked(file);		
+//	}
+//	
+//	private static boolean isFileLocked(File file) {
+//		try {
+//			if (file.exists()) FileUtils.touch(file);
+//			FileUtils.deleteQuietly(file);
+//			
+//			return false;
+//			
+//		} catch (Exception e) {
+//			LOG.error("File is locked: " + file.getAbsolutePath());
+//			return true;
+//		}
+//	}
 	
 }

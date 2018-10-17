@@ -14,7 +14,13 @@ class TestFactory {
 	@Test
 	void testCreate() {
 		if (factory == null) factory = PdfFactory.getInstance();
-		assertTrue(factory != null);		
+		assertTrue(factory != null);
+		
+		if (!factory.getTemplateMap().isEmpty()) {
+			assertTrue(factory.removeTemplateMap());
+			factory.cleanTemplateMap();
+			assertTrue(factory.getTemplateMap().isEmpty());
+		}
 	}
 	
 	@Test
