@@ -1,2 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<jsonDataAdapter class="net.sf.jasperreports.data.json.JsonDataAdapterImpl"><name>picture_rl</name><dataFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="repositoryDataLocation"><location>src\test\resources\resources\picture_rl_data.json</location></dataFile><language>json</language><useConnection>false</useConnection><timeZone xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:java="http://java.sun.com" xsi:type="java:java.lang.String">Europe/Prague</timeZone><locale xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:java="http://java.sun.com" xsi:type="java:java.lang.String">cs_CZ</locale><selectExpression></selectExpression></jsonDataAdapter>
+<!DOCTYPE xml>
+<jsonDataAdapter
+	class="net.sf.jasperreports.data.json.JsonDataAdapterImpl">
+	<name>picture_rl</name>
+	<dataFile
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:type="repositoryDataLocation">
+		<location>src\test\resources\resources\picture_rl_data.json</location>
+	</dataFile>
+	<language>json</language>
+	<useConnection>false</useConnection>
+	<timeZone
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:java="http://java.sun.com" xsi:type="java:java.lang.String">Europe/Prague</timeZone>
+	<locale xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:java="http://java.sun.com" xsi:type="java:java.lang.String">cs_CZ</locale>
+	<selectExpression></selectExpression>
+</jsonDataAdapter>
