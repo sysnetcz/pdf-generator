@@ -9,11 +9,26 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class TestFactory {
+	public static final String FS = PdfFactory.FILE_SEPARATOR;
+	public static final String BASE_PATH = (System.getProperty("java.io.tmpdir") + FS + "pdf-factory-base" + FS).replace(FS + FS, FS);
 	PdfFactory factory = null;
 
 	@Test
 	void testCreate() {
 		if (factory == null) factory = PdfFactory.getInstance();
+		assertTrue(factory != null);
+		
+		if (!factory.getTemplateMap().isEmpty()) {
+			assertTrue(factory.removeTemplateMap());
+			factory.cleanTemplateMap();
+			assertTrue(factory.getTemplateMap().isEmpty());
+		}
+	}
+	
+	@Test
+	void testCreateInBasePath() {
+		factory = null;
+		factory = PdfFactory.getInstance(BASE_PATH);
 		assertTrue(factory != null);
 		
 		if (!factory.getTemplateMap().isEmpty()) {

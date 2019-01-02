@@ -80,12 +80,6 @@ public class PdfFactory {
 		init(pathMap);
 		LOG.info("Factory created");
 	}
-
-	private PdfFactory() {
-		super();
-		init(null);
-		LOG.info("Factory created");
-	}
 		
 	private void init(Map<PathKey, String> pathMap) {
 		gson = new GsonBuilder()
@@ -103,15 +97,23 @@ public class PdfFactory {
 		LOG.info("Init done");
 	}
 	
-	private void initDirectories(Map<PathKey, String> pathMap) {
-		if (pathMap == null) pathMap = new HashMap<PathKey, String>();
-		if (!pathMap.containsKey(PathKey.CONFIG)) pathMap.put(PathKey.CONFIG, PATH_CONFIG);
-		if (!pathMap.containsKey(PathKey.DATA)) pathMap.put(PathKey.DATA, PATH_DATA);
-		if (!pathMap.containsKey(PathKey.PDF)) pathMap.put(PathKey.PDF, PATH_PDF);
-		if (!pathMap.containsKey(PathKey.TEMP)) pathMap.put(PathKey.TEMP, PATH_TEMP);
-		if (!pathMap.containsKey(PathKey.TEMPLATE)) pathMap.put(PathKey.TEMPLATE, PATH_TEMPLATE);			
-		for (Entry<PathKey, String> entry:pathMap.entrySet()) {
-			this.createDirectoryTree(entry.getValue());
+	private boolean initDirectories(Map<PathKey, String> pathMap) {
+		try {
+			if (pathMap == null) pathMap = new HashMap<PathKey, String>();
+			if (!pathMap.containsKey(PathKey.CONFIG)) pathMap.put(PathKey.CONFIG, PATH_CONFIG);
+			if (!pathMap.containsKey(PathKey.DATA)) pathMap.put(PathKey.DATA, PATH_DATA);
+			if (!pathMap.containsKey(PathKey.PDF)) pathMap.put(PathKey.PDF, PATH_PDF);
+			if (!pathMap.containsKey(PathKey.TEMP)) pathMap.put(PathKey.TEMP, PATH_TEMP);
+			if (!pathMap.containsKey(PathKey.TEMPLATE)) pathMap.put(PathKey.TEMPLATE, PATH_TEMPLATE);			
+			for (Entry<PathKey, String> entry:pathMap.entrySet()) {
+				this.createDirectoryTree(entry.getValue());
+			}
+			return true;
+			
+		} catch (Exception e) {
+			LOG.error("PdfFactory.initDirectories: " + e.getMessage());
+			e.printStackTrace();
+			return false;
 		}
 	}
 	
@@ -129,11 +131,31 @@ public class PdfFactory {
 	}
 	
 	public static PdfFactory getInstance() {
+		Map<PathKey, String> pathMap = new HashMap<PathKey, String>();
+		return getInstance(pathMap);
+	}
+	
+	public static PdfFactory getInstance(String basePath) {
+		Map<PathKey, String> pathMap = new HashMap<PathKey, String>();
+		if (basePath != null) {
+			if (!basePath.isEmpty()) {
+				basePath = (basePath + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
+				pathMap.put(PathKey.CONFIG, basePath + "conf" + FILE_SEPARATOR);
+				pathMap.put(PathKey.DATA, basePath + "data" + FILE_SEPARATOR);
+				pathMap.put(PathKey.PDF, basePath + "pdf" + FILE_SEPARATOR);
+				pathMap.put(PathKey.TEMP, basePath + "temp" + FILE_SEPARATOR);
+				pathMap.put(PathKey.TEMPLATE, basePath + "template" + FILE_SEPARATOR);
+			}
+		}
+		return getInstance(pathMap);
+	}
+	
+	public static PdfFactory getInstance(Map<PathKey, String> pathMap) {
 		PdfFactory result = instance;
 		if (result == null) {
 			synchronized (mutex) {
 				result = instance;
-				if (result == null) instance = new PdfFactory();
+				if (result == null) instance = new PdfFactory(pathMap);
 				result = instance;
 			}
 		}
