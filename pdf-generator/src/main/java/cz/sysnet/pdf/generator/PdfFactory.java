@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -70,20 +71,30 @@ public class PdfFactory {
 	public static final String PATH_CONFIG = PATH_DATA;
 	public static final String FILE_CONFIG_TEMPLATES = PATH_CONFIG + "templates.json";
 	
-	private PdfFactory() {
-		super();
-		init();
-		LOG.info("Factory created");
+	public static enum PathKey {
+		CONFIG, DATA, PDF, TEMP, TEMPLATE, WORK
 	}
 	
-	private void init() {
+	private PdfFactory(Map<PathKey, String> pathMap) {
+		super();
+		init(pathMap);
+		LOG.info("Factory created");
+	}
+
+	private PdfFactory() {
+		super();
+		init(null);
+		LOG.info("Factory created");
+	}
+		
+	private void init(Map<PathKey, String> pathMap) {
 		gson = new GsonBuilder()
 				.setDateFormat(GSON_DATE_FORMAT)
 				.setPrettyPrinting()
 				.create();
 		jsonParser = new JsonParser();
 		
-		this.initDirectories();
+		this.initDirectories(pathMap);
 		
 		this.templateMap = new HashMap<String, String>();
 		
@@ -92,13 +103,16 @@ public class PdfFactory {
 		LOG.info("Init done");
 	}
 	
-	private void initDirectories() {
-		this.createDirectoryTree(PATH_CONFIG);
-		this.createDirectoryTree(PATH_DATA);
-		this.createDirectoryTree(PATH_PDF);
-		this.createDirectoryTree(PATH_TEMP);
-		this.createDirectoryTree(PATH_TEMPLATE);
-		this.createDirectoryTree(PATH_WORK);
+	private void initDirectories(Map<PathKey, String> pathMap) {
+		if (pathMap == null) pathMap = new HashMap<PathKey, String>();
+		if (!pathMap.containsKey(PathKey.CONFIG)) pathMap.put(PathKey.CONFIG, PATH_CONFIG);
+		if (!pathMap.containsKey(PathKey.DATA)) pathMap.put(PathKey.DATA, PATH_DATA);
+		if (!pathMap.containsKey(PathKey.PDF)) pathMap.put(PathKey.PDF, PATH_PDF);
+		if (!pathMap.containsKey(PathKey.TEMP)) pathMap.put(PathKey.TEMP, PATH_TEMP);
+		if (!pathMap.containsKey(PathKey.TEMPLATE)) pathMap.put(PathKey.TEMPLATE, PATH_TEMPLATE);			
+		for (Entry<PathKey, String> entry:pathMap.entrySet()) {
+			this.createDirectoryTree(entry.getValue());
+		}
 	}
 	
 	private void createDirectoryTree(String pathString) {
