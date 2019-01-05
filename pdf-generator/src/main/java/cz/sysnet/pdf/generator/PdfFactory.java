@@ -70,6 +70,7 @@ public class PdfFactory {
 	public static final String PATH_PDF = PATH_DATA + "pdf"  + FILE_SEPARATOR;
 	public static final String PATH_CONFIG = PATH_DATA;
 	public static final String FILE_CONFIG_TEMPLATES = PATH_CONFIG + "templates.json";
+	public static Map<PathKey, String> PATH_MAP = null;
 	
 	public static enum PathKey {
 		CONFIG, DATA, PDF, TEMP, TEMPLATE, WORK
@@ -108,6 +109,7 @@ public class PdfFactory {
 			for (Entry<PathKey, String> entry:pathMap.entrySet()) {
 				this.createDirectoryTree(entry.getValue());
 			}
+			PATH_MAP = pathMap;
 			return true;
 			
 		} catch (Exception e) {
@@ -255,7 +257,7 @@ public class PdfFactory {
 	public String addTemplate(String key, String sourceFile, boolean removeSource) {
 		try {
 			File file = new File(sourceFile);
-			String targetFile = PATH_TEMPLATE + key + FILE_SEPARATOR + file.getName();
+			String targetFile = PATH_MAP.get(PathKey.TEMPLATE) + key + FILE_SEPARATOR + file.getName();
 			Path sourceFilePath = Paths.get(sourceFile);
 			if (!Files.exists(sourceFilePath)) throw new PdfGeneratorException("Zdrojový soubor neexistuje: " + sourceFilePath.toString());
 			Path targetFilePath = Paths.get(targetFile);
@@ -287,7 +289,7 @@ public class PdfFactory {
 	public String addTemplateResource(String key, String sourceFile, boolean removeSource) {
 		try {
 			File file = new File(sourceFile);
-			String targetFile = PATH_TEMPLATE + key + FILE_SEPARATOR + file.getName();
+			String targetFile = PATH_MAP.get(PathKey.TEMPLATE) + key + FILE_SEPARATOR + file.getName();
 			Path sourceFilePath = Paths.get(sourceFile);
 			if (!Files.exists(sourceFilePath)) throw new PdfGeneratorException("Zdrojový soubor neexistuje: " + sourceFilePath.toString());
 			Path targetFilePath = Paths.get(targetFile);
@@ -472,8 +474,8 @@ public class PdfFactory {
 		    JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, ds);
 		    if (pdfFileName == null) pdfFileName = generatePdfFileName();
 		    if (pdfFileName.isEmpty()) pdfFileName = generatePdfFileName();
-		    String pdfPath = PATH_PDF + pdfFileName;
-			Path targetFilePath = Paths.get(PATH_PDF);
+		    String pdfPath = PATH_MAP.get(PathKey.PDF) + pdfFileName;
+			Path targetFilePath = Paths.get(PATH_MAP.get(PathKey.PDF));
 			if (!Files.exists(targetFilePath)) {
 				Path td = Files.createDirectories(targetFilePath);
 				LOG.info("Directory created: " + td.toString());
