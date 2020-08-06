@@ -28,7 +28,7 @@ class TestFactory {
 	@Test
 	void testCreateInBasePath() {
 		factory = null;
-		factory = PdfFactory.getInstance(BASE_PATH);
+		factory = PdfFactory.getInstance();
 		assertTrue(factory != null);
 		
 		if (!factory.getTemplateMap().isEmpty()) {

@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -51,6 +53,8 @@ public class PdfFactory {
 	private static volatile PdfFactory instance;
 	private static Object mutex = new Object();
 	private static final Logger LOG = LogManager.getLogger(PdfFactory.class);
+	protected static Map<String, String> ENV = System.getenv(); 
+	
 	
 	public static final String GSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 	
@@ -63,13 +67,19 @@ public class PdfFactory {
 	private Map<String, String> templateMap;
 
 	public static final String FILE_SEPARATOR = System.getProperty("file.separator");
-	public static final String PATH_TEMP = (System.getProperty("java.io.tmpdir") + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
-	public static final String PATH_WORK = (System.getProperty("user.dir") + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
-	public static final String PATH_DATA = (System.getProperty("user.home") + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
-	public static final String PATH_TEMPLATE = PATH_DATA + "templates"  + FILE_SEPARATOR;
-	public static final String PATH_PDF = PATH_DATA + "pdf"  + FILE_SEPARATOR;
-	public static final String PATH_CONFIG = PATH_DATA;
-	public static final String FILE_CONFIG_TEMPLATES = PATH_CONFIG + "templates.json";
+	
+	public static String BASE_DIR = getEnvString("PDF_DATA_DIR", System.getProperty("user.home"));
+	public static String TEMP_DIR = getEnvString("PDF_TEMP_DIR", System.getProperty("java.io.tmpdir"));
+	public static String WORK_DIR = getEnvString("PDF_WORK_DIR", System.getProperty("user.dir"));
+	public static String DATA_DIR = getEnvString("PDF_HOME_DIR", System.getProperty("user.home"));
+	
+	public static String PATH_TEMP = (TEMP_DIR + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
+	public static String PATH_WORK = (WORK_DIR + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
+	public static String PATH_DATA = (DATA_DIR + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
+	public static String PATH_TEMPLATE = PATH_DATA + "templates"  + FILE_SEPARATOR;
+	public static String PATH_PDF = PATH_DATA + "pdf"  + FILE_SEPARATOR;
+	public static String PATH_CONFIG = PATH_DATA;
+	public static String FILE_CONFIG_TEMPLATES = PATH_CONFIG + "templates.json";
 	public static Map<PathKey, String> PATH_MAP = null;
 	
 	public static enum PathKey {
@@ -132,27 +142,79 @@ public class PdfFactory {
 		}
 	}
 	
-	public static PdfFactory getInstance() {
-		Map<PathKey, String> pathMap = new HashMap<PathKey, String>();
-		return getInstance(pathMap);
+	public static Map<String, String> getEnv() {
+		return ENV;
 	}
 	
-	public static PdfFactory getInstance(String basePath) {
+	public static String getEnvString(String key, String defaultValue) {
+		String out = defaultValue;
+		if (ENV.containsKey(key)) out = ENV.get(key);
+		LOG.debug("(getEnvString) " + key + ": " + out);
+		return out;		
+	}
+	
+	public static boolean getEnvBoolean(String key, boolean defaultValue) {
+		boolean out = defaultValue;
+		String w = getEnvString(key, Boolean.toString(out));
+		out = Boolean.parseBoolean(w);
+		return out;		
+	}
+	
+	public static int getEnvInteger(String key, int defaultValue) {
+		int out = defaultValue;
+		String w = getEnvString(key, Integer.toString(out));
+		out = Integer.parseInt(w);
+		return out;	
+	}
+	
+	public static String convertMapToString(Map<String, ?> map) {
+	    return Joiner.on(",").withKeyValueSeparator("=").join(map);
+	}
+	
+	public static Map<String, String> convertStringToMap(String stringToSplit) {
+		try {
+			return Splitter.on(",").withKeyValueSeparator("=").split(stringToSplit);
+			
+		} catch (Exception e) {
+			return null;
+		}		
+	}
+	
+	public static Map<String, String> mergeMaps(Map<String, String> map1, Map<String, String> map2) {
+		if ((map1 == null) && (map2 == null)) return null;
+		Map<String, String> out = new HashMap<String, String>();
+		if ((map1 == null) && (map2 != null)) {
+			out.putAll(map2);
+			return out;
+		}
+		if ((map1 != null) && (map2 == null)) { 
+			out.putAll(map1);
+			return out;
+		}
+		out.putAll(map1);
+		out.putAll(map2);
+		return out;		
+	}
+	
+	public static PdfFactory getInstance() {
+		return _getInstance("");	// vzdycky pouzijeme BASE_DIR
+	}
+	
+	private static PdfFactory _getInstance(String basePath) {
 		Map<PathKey, String> pathMap = new HashMap<PathKey, String>();
 		if (basePath != null) {
-			if (!basePath.isEmpty()) {
-				basePath = (basePath + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
-				pathMap.put(PathKey.CONFIG, basePath + "conf" + FILE_SEPARATOR);
-				pathMap.put(PathKey.DATA, basePath + "data" + FILE_SEPARATOR);
-				pathMap.put(PathKey.PDF, basePath + "pdf" + FILE_SEPARATOR);
-				pathMap.put(PathKey.TEMP, basePath + "temp" + FILE_SEPARATOR);
-				pathMap.put(PathKey.TEMPLATE, basePath + "template" + FILE_SEPARATOR);
-			}
+			if (basePath.isEmpty()) basePath = BASE_DIR;
+			basePath = (basePath + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
+			pathMap.put(PathKey.CONFIG, basePath + "conf" + FILE_SEPARATOR);
+			pathMap.put(PathKey.DATA, basePath + "data" + FILE_SEPARATOR);
+			pathMap.put(PathKey.PDF, basePath + "pdf" + FILE_SEPARATOR);
+			pathMap.put(PathKey.TEMP, basePath + "temp" + FILE_SEPARATOR);
+			pathMap.put(PathKey.TEMPLATE, basePath + "template" + FILE_SEPARATOR);
 		}
-		return getInstance(pathMap);
+		return _getInstance(pathMap);
 	}
 	
-	public static PdfFactory getInstance(Map<PathKey, String> pathMap) {
+	private static PdfFactory _getInstance(Map<PathKey, String> pathMap) {
 		PdfFactory result = instance;
 		if (result == null) {
 			synchronized (mutex) {
