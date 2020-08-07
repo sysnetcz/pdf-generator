@@ -45,5 +45,34 @@ Pro tvormu šablon se používá OpenSource produkt **Jaspersoft Studio** viz [V
 ## Spolupráce
 Používá JAR knihovnu vytvořenou projektem **pdf-generator** <http://git.sysnet.cz/cites/pdf-generator.git> 
 
+## Docker
+Služba je plne dockerizovaná obsahuje jak __Dockerfile__, tak i __docker-compose.yml__. 
+Obraz docker se postaví a spustí tímto příkazem:
+
+	$ docker build --tag sysnetcz/pdf .
+	$ docker run -d -p 127.0.0.1:8081:8080 --name pdf -t sysnetcz/pdf
 
 
+### docker-compose
+	
+Stack docker-compose se postaví a spustí takto:
+
+	$ docker-compose build
+	$ docker-compose up -d 	
+
+### Systémové proměnné
+
+Aplikace může používat systémopvé proměnné vzorového obrazu __tomcat:5.8__ a má jednu vlastní proměnnou __PDF_DATA_DIR__ pro umístění datového adresáře v obraze. Obvykle ji není nutno používat.
+
+### Persistence dat
+
+Je vhodné umístit data vně kontejneru. 
+
+	$ docker volume create pdf_data
+	$ docker run -d \
+		-p 127.0.0.1:8081:8080 \
+		--name pdf \
+		--restart=always \
+		-v pdf_data:/usr/local/data
+		-t sysnetcz/pdf
+ 
