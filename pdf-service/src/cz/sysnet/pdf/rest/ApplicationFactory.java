@@ -41,7 +41,7 @@ import cz.sysnet.pdf.rest.model.Template;
 public final class ApplicationFactory {
 	// slouzi k provadeni vsech produkcnich akci v aplikaci
 	
-	public static String VERSION = getProjectVersion();
+	public static String VERSION = "1.1.2-SNAPSHOT";
 	private static volatile ApplicationFactory instance = null;
 	public static final Logger LOG = Logger.getLogger(ApplicationFactory.class.getName());
 	public static Long LONG_ZERO = Long.valueOf(0);
@@ -597,7 +597,7 @@ public final class ApplicationFactory {
 	}
 
 	public String getVersion() {
-		return version;
+		return VERSION;
 	}	
 	public String getTitle() {
 		return title;
