@@ -1,30 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?><project-modules id="moduleCoreId" project-version="1.5.0">
-            
+                
+    
     
     <wb-module deploy-name="pdf-service">
-                        
+                                
+        
         
         <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
-                        
+                                
+        
         
         <wb-resource deploy-path="/" source-path="/WebContent" tag="defaultRootSource"/>
-                        
+                                
+        
         
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
-                
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/WebContent"/>
-        <dependent-module archiveName="pdf-generator-1.1.2.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/pdf-generator/pdf-generator">
-            <dependency-type>uses</dependency-type>
-        </dependent-module>
                         
+        
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/WebContent"/>
+                                
+        
         
         <property name="context-root" value="pdf-service"/>
-                        
+                                
+        
         
         <property name="java-output-path" value="/pdf-service/build/classes"/>
-                    
+                            
+    
     
     </wb-module>
-        
+            
+
 
 </project-modules>
