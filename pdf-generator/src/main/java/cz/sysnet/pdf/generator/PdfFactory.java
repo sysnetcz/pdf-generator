@@ -40,6 +40,8 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 
 /**
  * PdfFactory je singleton, ktery slouzi ke generovani PDF dokumentu z dodanych dat pomoci reportovaci sablony Jaser Reports
@@ -69,21 +71,19 @@ public class PdfFactory {
 	public static final String FILE_SEPARATOR = System.getProperty("file.separator");
 	
 	public static String BASE_DIR = getEnvString("PDF_DATA_DIR", System.getProperty("user.home"));
-	public static String TEMP_DIR = getEnvString("PDF_TEMP_DIR", System.getProperty("java.io.tmpdir"));
-	public static String WORK_DIR = getEnvString("PDF_WORK_DIR", System.getProperty("user.dir"));
-	public static String DATA_DIR = getEnvString("PDF_HOME_DIR", System.getProperty("user.home"));
 	
-	public static String PATH_TEMP = (TEMP_DIR + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
-	public static String PATH_WORK = (WORK_DIR + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
-	public static String PATH_DATA = (DATA_DIR + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
-	public static String PATH_TEMPLATE = PATH_DATA + "templates"  + FILE_SEPARATOR;
-	public static String PATH_PDF = PATH_DATA + "pdf"  + FILE_SEPARATOR;
-	public static String PATH_CONFIG = PATH_DATA;
+	public static String PATH_CONFIG = (BASE_DIR + FILE_SEPARATOR + "config" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
 	public static String FILE_CONFIG_TEMPLATES = PATH_CONFIG + "templates.json";
+	public static String PATH_DATA = (BASE_DIR + FILE_SEPARATOR + "data" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
+	public static String PATH_PDF = PATH_DATA + "pdf"  + FILE_SEPARATOR;
+	public static String PATH_TEMP = (BASE_DIR + FILE_SEPARATOR + "temp" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
+	public static String PATH_TEMPLATE = PATH_DATA + "templates"  + FILE_SEPARATOR;
+	public static String PATH_UPLOAD = PATH_DATA + "uploads"  + FILE_SEPARATOR;
+	public static String PATH_WORK = (BASE_DIR + FILE_SEPARATOR + "work" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
 	public static Map<PathKey, String> PATH_MAP = null;
 	
 	public static enum PathKey {
-		CONFIG, DATA, PDF, TEMP, TEMPLATE, WORK
+		CONFIG, DATA, PDF, TEMP, TEMPLATE, UPLOAD, WORK
 	}
 	
 	private PdfFactory(Map<PathKey, String> pathMap) {
@@ -116,6 +116,8 @@ public class PdfFactory {
 			if (!pathMap.containsKey(PathKey.PDF)) pathMap.put(PathKey.PDF, PATH_PDF);
 			if (!pathMap.containsKey(PathKey.TEMP)) pathMap.put(PathKey.TEMP, PATH_TEMP);
 			if (!pathMap.containsKey(PathKey.TEMPLATE)) pathMap.put(PathKey.TEMPLATE, PATH_TEMPLATE);			
+			if (!pathMap.containsKey(PathKey.UPLOAD)) pathMap.put(PathKey.UPLOAD, PATH_UPLOAD);
+			if (!pathMap.containsKey(PathKey.WORK)) pathMap.put(PathKey.WORK, PATH_WORK);			
 			for (Entry<PathKey, String> entry:pathMap.entrySet()) {
 				this.createDirectoryTree(entry.getValue());
 			}
@@ -207,9 +209,11 @@ public class PdfFactory {
 			basePath = (basePath + FILE_SEPARATOR + "pdf_factory" + FILE_SEPARATOR).replace(FILE_SEPARATOR+FILE_SEPARATOR, FILE_SEPARATOR);
 			pathMap.put(PathKey.CONFIG, basePath + "conf" + FILE_SEPARATOR);
 			pathMap.put(PathKey.DATA, basePath + "data" + FILE_SEPARATOR);
-			pathMap.put(PathKey.PDF, basePath + "pdf" + FILE_SEPARATOR);
+			pathMap.put(PathKey.PDF, basePath + "data"+ FILE_SEPARATOR + "pdf" + FILE_SEPARATOR);
 			pathMap.put(PathKey.TEMP, basePath + "temp" + FILE_SEPARATOR);
-			pathMap.put(PathKey.TEMPLATE, basePath + "template" + FILE_SEPARATOR);
+			pathMap.put(PathKey.TEMPLATE, basePath + "data"+ FILE_SEPARATOR + "templates" + FILE_SEPARATOR);
+			pathMap.put(PathKey.UPLOAD, basePath + "data"+ FILE_SEPARATOR + "uploads" + FILE_SEPARATOR);
+			pathMap.put(PathKey.WORK, basePath + "work"+ FILE_SEPARATOR);			
 		}
 		return _getInstance(pathMap);
 	}
@@ -661,6 +665,33 @@ public class PdfFactory {
 			return null;
 		}
 	}
+	
+	public Map<PathKey, String> getPathMap() {
+		return PATH_MAP;
+	}
+	
+	public static String getProjectVersion() {
+		String out = "";
+		Model model = getProjectModel();
+		if (model != null) out = model.getVersion();
+		return out;
+	}
+	
+	public static Model getProjectModel() {
+		Model out = null;
+		try {
+			MavenXpp3Reader reader = new MavenXpp3Reader();
+	        out = reader.read(new FileReader("pom.xml"));
+		
+		} catch (Exception e) {
+			LOG.error("getProjectModel - " + e.getMessage());
+			e.printStackTrace();
+			out = null;
+		} 
+		return out;
+	}
+	
+	
 	
 //	private static boolean isFileLocked(String filePath) {
 //		File file = new File(filePath);

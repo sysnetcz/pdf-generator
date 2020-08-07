@@ -12,6 +12,14 @@ class TestFactory {
 	public static final String FS = PdfFactory.FILE_SEPARATOR;
 	public static final String BASE_PATH = (System.getProperty("java.io.tmpdir") + FS + "pdf-factory-base" + FS).replace(FS + FS, FS);
 	PdfFactory factory = null;
+	
+	@Test
+	void testProjectVersion() {		
+		String out = PdfFactory.getProjectVersion();
+		System.out.println(out);
+		assertTrue(out != null);
+	}
+	
 
 	@Test
 	void testCreate() {
