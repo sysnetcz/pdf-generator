@@ -13,7 +13,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -350,12 +352,14 @@ public class PdfRESTService {
  
 	@GET
 	@Path("verify")
-	@Produces(MediaType.TEXT_PLAIN+";charset=utf-8")
+	//@Produces(MediaType.TEXT_PLAIN+";charset=utf-8")
+	@Produces(MediaType.APPLICATION_JSON+";charset=utf-8")
 	public Response verifyRESTService(InputStream incomingData) {
 		ApplicationFactory.getInstance().counterRunIncrement("verify GET");
         
-		String result = "PdfRESTService Successfully started..";
- 
+		Map<String, String> result = new HashMap<String, String>();
+		result.put("verify", "PdfRESTService Successfully started..");
+		
 		// return HTTP response 200 in case of success
 		LOG.info("verify GET");       
         return Response.status(200).entity(result).build();

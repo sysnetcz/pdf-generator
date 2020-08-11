@@ -43,7 +43,7 @@ import cz.sysnet.pdf.rest.model.Template;
 public final class ApplicationFactory {
 	// slouzi k provadeni vsech produkcnich akci v aplikaci
 	
-	public static String VERSION = "1.1.3";
+	public static String VERSION = "1.1.4";
 	private static volatile ApplicationFactory instance = null;
 	//public static final Logger LOG = Logger.getLogger(ApplicationFactory.class.getName());
 	public static final Logger LOG = LogManager.getLogger(ApplicationFactory.class);
