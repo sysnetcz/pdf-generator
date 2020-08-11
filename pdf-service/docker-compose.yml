@@ -11,7 +11,7 @@ networks:
 services:
   pdf:
     image: sysnetcz/pdf
-    build: .
+    # build: .
     container_name: pdf
     restart: always
     ports:
