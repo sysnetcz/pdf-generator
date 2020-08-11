@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLDecoder;
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -13,12 +13,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cz.sysnet.pdf.rest.ApplicationFactory;
 
 public class FileDownloadServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	public static final Logger LOG = Logger.getLogger(FileDownloadServlet.class.getName());
+	//public static final Logger LOG = Logger.getLogger(FileDownloadServlet.class.getName());
+	public static final Logger LOG = LogManager.getLogger(FileDownloadServlet.class);
 	
 	//	http://localhost:8080/myapp/download?file=7
 	

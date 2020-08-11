@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -15,6 +15,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import cz.sysnet.pdf.rest.ApplicationFactory;
 
@@ -27,7 +29,8 @@ import cz.sysnet.pdf.rest.ApplicationFactory;
 public class FileUploadServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
-    public static final Logger LOG = Logger.getLogger(FileUploadServlet.class.getName());
+    //public static final Logger LOG = Logger.getLogger(FileUploadServlet.class.getName());
+    public static final Logger LOG = LogManager.getLogger(FileUploadServlet.class);
 	 
     // location to store file uploaded
     //private static final String UPLOAD_DIRECTORY = "upload";
@@ -53,7 +56,7 @@ public class FileUploadServlet extends HttpServlet {
             PrintWriter writer = response.getWriter();
             writer.println("Error: Form must has enctype=multipart/form-data.");
             writer.flush();
-            LOG.severe("Error: Form must has enctype=multipart/form-data.");
+            LOG.error("Error: Form must has enctype=multipart/form-data.");
             return;
         }
  
@@ -135,7 +138,7 @@ public class FileUploadServlet extends HttpServlet {
             }
         } catch (Exception e) {
         	message = "There was an error: " + e.getMessage();
-            LOG.severe("There was an error: " + e.getMessage());
+            LOG.error("There was an error: " + e.getMessage());
             e.printStackTrace();
         }
         if (uploaded && hasKey) {
@@ -158,7 +161,7 @@ public class FileUploadServlet extends HttpServlet {
         }
     	if (!success) {
          	message +=  "<br/><strong>NO TEMPLATE PROCESSED: </strong>>" + key +" (" + description + ")";
-        	LOG.warning("NO TEMPLATE PROCESSED - " + "KEY: " + key + ", " + "FILE: " + fileName);
+        	LOG.warn("NO TEMPLATE PROCESSED - " + "KEY: " + key + ", " + "FILE: " + fileName);
     	}
     	if(success) {
     		request.setAttribute("alert", "success");

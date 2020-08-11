@@ -18,13 +18,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.configuration2.XMLConfiguration;
 import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.joda.time.DateTime;
@@ -41,9 +43,10 @@ import cz.sysnet.pdf.rest.model.Template;
 public final class ApplicationFactory {
 	// slouzi k provadeni vsech produkcnich akci v aplikaci
 	
-	public static String VERSION = "1.1.2-SNAPSHOT";
+	public static String VERSION = "1.1.3";
 	private static volatile ApplicationFactory instance = null;
-	public static final Logger LOG = Logger.getLogger(ApplicationFactory.class.getName());
+	//public static final Logger LOG = Logger.getLogger(ApplicationFactory.class.getName());
+	public static final Logger LOG = LogManager.getLogger(ApplicationFactory.class);
 	public static Long LONG_ZERO = Long.valueOf(0);
 	public static final String TEMPLATE_EXT = ".jrxml";
 	
@@ -55,9 +58,10 @@ public final class ApplicationFactory {
 	private String pdfDirectory = null;
 	private String uploadDirectory = null;
 	private String temporaryDirectory = null;
-	private Map<String, String> dirMap = null;
-	
+	private Map<String, String> dirMap = null;	
 	private Map<String, String> templateMap = null;
+	
+	private Map<PathKey, String> pathMap = null;
 	
 	private String version = "";
 	private String title = "";
@@ -91,37 +95,37 @@ public final class ApplicationFactory {
 			this.counter = new TreeMap<String, ServiceLog>();
 			
 			this.pdfFactory = PdfFactory.getInstance();
-			Map<PathKey, String> pathMap = this.pdfFactory.getPathMap();
-			
-			// init directories
-			this.configDirectory = pathMap.get(PathKey.CONFIG);
-			this.dirMap.put("CONFIG", this.configDirectory);
-			
-			this.dataDirectory = this.initConfigString("service.dataDirectory", pathMap.get(PathKey.DATA));
-			this.dirMap.put("DATA", this.dataDirectory);
-			
-			this.temporaryDirectory = this.initConfigString("service.temporaryDirectory", pathMap.get(PathKey.TEMP));
-			this.dirMap.put("TEMP", this.temporaryDirectory);
-
-			this.templateDirectory = this.initConfigString("service.templateDirectory", pathMap.get(PathKey.TEMPLATE));
-			this.dirMap.put("TEMPLATE", this.templateDirectory);
-			
-			this.pdfDirectory = this.initConfigString("service.pdfDirectory", pathMap.get(PathKey.PDF));
-			this.dirMap.put("PDF", this.pdfDirectory);
-			
-			this.uploadDirectory = this.initConfigString("service.uploadDirectory", pathMap.get(PathKey.UPLOAD));
-			this.dirMap.put("UPLOAD", this.uploadDirectory);
-			
-			this.workDirectory = this.initConfigString("service.workDirectory", pathMap.get(PathKey.WORK));
-			this.dirMap.put("WORK", this.workDirectory);
+			this.pathMap = this.pdfFactory.getPathMap();
 			
 			// init configuration			
+			this.configDirectory = pathMap.get(PathKey.CONFIG);
+			this.dirMap.put("CONFIG", this.configDirectory);
 			this.configPath = this.configDirectory + File.separatorChar + "service.xml";
 			this.initConfigFile();
 			this.configs = new Configurations();
 			this.configBuilder = configs.xmlBuilder(this.configPath);
 			this.config = this.configBuilder.getConfiguration();
 			
+			// init directories
+			this.dataDirectory = this.initConfigString("service.dataDirectory", this.pathMap.get(PathKey.DATA));
+			this.dirMap.put("DATA", this.dataDirectory);
+			
+			this.temporaryDirectory = this.initConfigString("service.temporaryDirectory", this.pathMap.get(PathKey.TEMP));
+			this.dirMap.put("TEMP", this.temporaryDirectory);
+
+			this.templateDirectory = this.initConfigString("service.templateDirectory", this.pathMap.get(PathKey.TEMPLATE));
+			this.dirMap.put("TEMPLATE", this.templateDirectory);
+			
+			this.pdfDirectory = this.initConfigString("service.pdfDirectory", this.pathMap.get(PathKey.PDF));
+			this.dirMap.put("PDF", this.pdfDirectory);
+			
+			this.uploadDirectory = this.initConfigString("service.uploadDirectory", this.pathMap.get(PathKey.UPLOAD));
+			this.dirMap.put("UPLOAD", this.uploadDirectory);
+			
+			this.workDirectory = this.initConfigString("service.workDirectory", this.pathMap.get(PathKey.WORK));
+			this.dirMap.put("WORK", this.workDirectory);
+			
+			// finish configuration
 			this.maxFileSize = this.initConfigInteger("upload.maxFileSize", 1024 * 1024 * 40);
 			this.maxRequestSize = this.initConfigInteger("upload.maxRequestSize", 1024 * 1024 * 50);
 			this.memoryTreshold = this.initConfigInteger("upload.memoryTreshold", 1024 * 1024 * 3);
@@ -134,7 +138,7 @@ public final class ApplicationFactory {
 			LOG.info("ApplicationFactory initialized: " + this.title + ", " + this.version);
 			
 		} catch (Exception e) {
-			LOG.severe("cz.sysnet.pdf.rest.ApplicationFactory.init FAILED: " + e.getMessage());
+			LOG.error("cz.sysnet.pdf.rest.ApplicationFactory.init FAILED: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}
@@ -186,20 +190,20 @@ public final class ApplicationFactory {
 									LOG.info(item + ": " + files[0].getPath());
 								}
 							} else {
-								LOG.warning("NO TEMPLATE FILES");
+								LOG.warn("NO TEMPLATE FILES");
 							}
 						} else {
-							LOG.warning("NO TEMPLATE FILES (null)");
+							LOG.warn("NO TEMPLATE FILES (null)");
 						}
 					}
 				} else {
-					LOG.warning("NO TEMPLATES");
+					LOG.warn("NO TEMPLATES");
 				}
 			} else {
-				LOG.warning("NO TEMPLATES (null)");
+				LOG.warn("NO TEMPLATES (null)");
 			}
 		} catch (Exception e) {
-			LOG.severe(e.getMessage());
+			LOG.error(e.getMessage());
 			e.printStackTrace();
 			out = new HashMap<String, String>();
 		}
@@ -247,14 +251,14 @@ public final class ApplicationFactory {
 			out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), "UTF-8"));
 		    out.write(xml);
 		} catch (Exception e) {
-			LOG.severe("cz.sysnet.pdf.rest.ApplicationFactory.initConfigFile FAILED: " + e.getMessage());
+			LOG.error("cz.sysnet.pdf.rest.ApplicationFactory.initConfigFile FAILED: " + e.getMessage());
 			e.printStackTrace();
 			
 		} finally {
 			try {
 				if (out != null) out.close();
 			} catch (IOException e) {
-				LOG.severe("cz.sysnet.pdf.rest.ApplicationFactory.initConfigFile finally FAILED: " + e.getMessage());
+				LOG.error("cz.sysnet.pdf.rest.ApplicationFactory.initConfigFile finally FAILED: " + e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -283,11 +287,13 @@ public final class ApplicationFactory {
 		Duration dur = this.getDuration();
 		Period per = dur.toPeriod();
 		
+		int hours = per.getHours();
+		int days = hours / 24;
+		hours = hours % 24;
+		
 		String out = "Doba běhu: ";
-		out += per.getYears() + "R, ";				
-		out += per.getMonths() + "M, ";				
-		out += per.getDays() + "d, ";
-		out += per.getHours() + "h, ";
+		out += Integer.toString(days) + "d, ";
+		out += Integer.toString(hours) + "h, ";
 		out += per.getMinutes() + "m, ";
 		out += per.getSeconds() + "s";
 		return out;		
@@ -386,7 +392,7 @@ public final class ApplicationFactory {
 			return out;
 			
 		} catch (Exception e) {
-			LOG.severe("cz.sysnet.pdf.rest.ApplicationFactory.getPath: " + e.getMessage());
+			LOG.error("cz.sysnet.pdf.rest.ApplicationFactory.getHtmlUploadedTable: " + e.getMessage());
 			e.printStackTrace();
 			return e.getMessage();
 		}
@@ -414,7 +420,7 @@ public final class ApplicationFactory {
 			out = Arrays.asList(files);
 
 		} catch (Exception e) {
-			LOG.severe("cz.sysnet.pdf.rest.ApplicationFactory.getPdfFileList: " + e.getMessage());
+			LOG.error("cz.sysnet.pdf.rest.ApplicationFactory.getPdfFileList: " + e.getMessage());
 			e.printStackTrace();
 			out = new ArrayList<File>();
 		}
@@ -434,7 +440,7 @@ public final class ApplicationFactory {
 			if (files != null) if (files.length > 0) out = files[0]; 
 
 		} catch (Exception e) {
-			LOG.severe("cz.sysnet.pdf.rest.ApplicationFactory.getPdfFile: " + e.getMessage());
+			LOG.error("cz.sysnet.pdf.rest.ApplicationFactory.getPdfFile: " + e.getMessage());
 			e.printStackTrace();
 			out = null;
 		}
@@ -548,7 +554,7 @@ public final class ApplicationFactory {
 			return responsePath;
 			
 		} catch (Exception e) {
-			LOG.severe("cz.sysnet.pdf.rest.ApplicationFactory.getPath: " + e.getMessage());
+			LOG.error("cz.sysnet.pdf.rest.ApplicationFactory.getPath: " + e.getMessage());
 			e.printStackTrace();
 			return "";
 		}
@@ -641,7 +647,7 @@ public final class ApplicationFactory {
         		LOG.info("TEMPLATE RESOURCE STORED: " + key + ", " + out);
         	}
 		} catch (Exception e) {
-			LOG.severe("cz.sysnet.pdf.rest.ApplicationFactory.extractFile FAILED: " + e.getMessage());
+			LOG.error("cz.sysnet.pdf.rest.ApplicationFactory.extractFile FAILED: " + e.getMessage());
 			e.printStackTrace();
 			out = null;
 		}
@@ -662,7 +668,7 @@ public final class ApplicationFactory {
 	        out = reader.read(new FileReader("pom.xml"));
 		
 		} catch (Exception e) {
-			LOG.severe("cz.sysnet.pdf.rest.ApplicationFactory.getProjectModel FAILED: " + e.getMessage());
+			LOG.error("cz.sysnet.pdf.rest.ApplicationFactory.getProjectModel FAILED: " + e.getMessage());
 			e.printStackTrace();
 			out = null;
 		} 
