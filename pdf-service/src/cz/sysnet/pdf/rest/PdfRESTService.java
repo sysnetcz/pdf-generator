@@ -68,6 +68,7 @@ public class PdfRESTService {
     public Templates getTemplate(@Context UriInfo uriInfo) {
         ApplicationFactory.getInstance().counterRunIncrement("template GET");
         
+        reloadTemplateDb();
         List<Template> list = TemplateDB.getAllTemplates(); 
         
         Templates templates = new Templates();
@@ -99,6 +100,7 @@ public class PdfRESTService {
     public Response getTemplateByKey(@PathParam("key") String key, @Context UriInfo uriInfo){
     	ApplicationFactory.getInstance().counterRunIncrement("template GET");
     	
+    	reloadTemplateDb();
         Template item = TemplateDB.getTemplate(key);
         
         if(item == null) {
@@ -385,5 +387,10 @@ public class PdfRESTService {
 		}
 		return out;		
 	}
- 
+	
+	private static void reloadTemplateDb() {
+		// regenerate template map form filesystem
+        Map<String, String> templateMap = ApplicationFactory.getInstance().initTemplateMap();	
+        TemplateDB.loadTemplateMap(templateMap);		
+	}
 }
